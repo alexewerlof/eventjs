@@ -64,7 +64,9 @@ function eventListener4 () {
 var evt = new Eventjs( 'start', 'stop' );
 evt.on( 'start', eventListener1, eventListener2 );
 evt.on( 'start', eventListener3).on( 'stop', eventListener4 );
-evt.trigger( 'start' );//writes Listener 1, Listener 2, Listener 3, Listener 4 in the console window
+
+evt.trigger( 'start' );//writes Listener 1, Listener 2 and Listener 3 in the console window
+evt.trigger( 'stop' );//writes Listener 4
 ```
 
 Removing event listeners

@@ -29,7 +29,7 @@ function Eventjs ( /* list of at least event names and one optional target objec
                 throw {
                     'name': 'Invalid parameter',
                     'message': 'Eventjs() only accepts string and object parameters'
-                }
+                };
                 break;
         }
     }
@@ -74,7 +74,9 @@ function Eventjs ( /* list of at least event names and one optional target objec
         switch ( arguments.length ) {
             case 0: //no event name specified. remove all event listeners
                 for ( var iEventName in events ) {
-                    target.off( iEventName );
+                    if ( events.hasOwnProperty( iEventName ) ) {
+                        target.off( iEventName );
+                    }
                 }
                 break;
             case 1: //only the event name specified. remove all event listeners for this particular event
@@ -92,9 +94,9 @@ function Eventjs ( /* list of at least event names and one optional target objec
                 checkEventName( eventName );
                 //add every handler to the list of events for this particular event name
                 for ( var i = 1 ; i < arguments.length ; i++ ) {
-                    var listener = arguments[ i ];
+                    var currListener = arguments[ i ];
                     //if this handler doesn't already exist in the list add it
-                    var currHandlerIndex = events[ eventName ].indexOf( listener );
+                    var currHandlerIndex = events[ eventName ].indexOf( currListener );
                     if ( currHandlerIndex !== -1 ) {
                         events[ eventName ].splice( currHandlerIndex, 1 );
                     }

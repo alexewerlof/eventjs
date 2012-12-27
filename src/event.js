@@ -6,26 +6,31 @@
  *   on(), off(), trigger()
  * The parameters can be string or object. Strings represent event names and object represents the object that is
  * applied to the event listeners as their 'this'
+ * Duplicate event strings are allowed though it doesn't have any useful application!
+ * Duplicate target objects is allowed too. The last one will be set as the target.
+ * If no target object is specified, the listener functions will be called with their 'this' set to the current instance
+ * of eventjs object.
  * @constructor
  */
 function Eventjs ( /* list of at least event names and one optional target object (in any order) */ ) {
     "use strict";
-    var events = [];
+    var events = {};
     var target = this;
     for ( var i = 0; i < arguments.length; i++ ) {
         var arg = arguments[ i ];
         switch ( typeof arg ) {
             case 'string':
-                events[ arguments[ i ] ] = [];
+                events[ arg ] = [ /*list of event listeners */];
                 break;
             case 'object':
-                target = arg;
+                target = arg;// 'this' for the listeners
                 break;
             default:
                 throw {
                     'name': 'Invalid parameter',
                     'message': 'Eventjs() only accepts string and object parameters'
                 }
+                break;
         }
     }
 
@@ -66,15 +71,35 @@ function Eventjs ( /* list of at least event names and one optional target objec
     //** un-register a handler from an event name. if handler is missing, all handlers will be removed
     target.off = function ( eventName/*, one or more listeners... */ ) {
         "use strict";
-        checkEventName( eventName );
-        //add every handler to the list of events for this particular event name
-        for ( var i = 1 ; i < arguments.length ; i++ ) {
-            var listener = arguments[ i ];
-            //if this handler doesn't already exist in the list add it
-            var currHandlerIndex = events[ eventName ].indexOf( listener );
-            if ( currHandlerIndex !== -1 ) {
-                events[ eventName ].splice( currHandlerIndex, 1 );
-            }
+        switch ( arguments.length ) {
+            case 0: //no event name specified. remove all event listeners
+                for ( var iEventName in events ) {
+                    target.off( iEventName );
+                }
+                break;
+            case 1: //only the event name specified. remove all event listeners for this particular event
+                checkEventName( eventName );
+                while ( true ) {
+                    var listener = events[ eventName ][0];
+                    if ( listener ) {
+                        target.off( eventName, listener );
+                    } else {
+                        break;
+                    }
+                }
+                break;
+            default: //remove the specified event listeners for the specified event name
+                checkEventName( eventName );
+                //add every handler to the list of events for this particular event name
+                for ( var i = 1 ; i < arguments.length ; i++ ) {
+                    var listener = arguments[ i ];
+                    //if this handler doesn't already exist in the list add it
+                    var currHandlerIndex = events[ eventName ].indexOf( listener );
+                    if ( currHandlerIndex !== -1 ) {
+                        events[ eventName ].splice( currHandlerIndex, 1 );
+                    }
+                }
+                break;
         }
         return this;
     };

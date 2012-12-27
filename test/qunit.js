@@ -63,3 +63,68 @@ test( 'attaching to an object', function () {
     });
     obj.trigger( 'start' );
 });
+
+test( 'chaining', function () {
+    function onStart () {
+        ok( true, 'on start event called')
+    }
+    expect( 1 );
+    var evt = new Eventjs( 'start' );
+    evt.on( 'start', onStart ).trigger( 'start').off( 'start', onStart).trigger( 'start' );
+});
+
+test( 'no duplicate listener', function () {
+    expect( 1 );
+    function onStart () {
+        ok( test, 'onStart called' );
+    }
+    var evt = new Eventjs( 'start' );
+    evt.on( 'start', onStart );
+    evt.on( 'start', onStart );
+    evt.trigger( 'start' );
+});
+
+test( 'remove all listeners for an event name', function () {
+    var evt = new Eventjs( 'roar', 'meow' );
+    function listener1 () {
+        ok( true, 'listener1');
+    }
+    function listener2 () {
+        ok( true, 'listener2' );
+    }
+    function listener3 () {
+        ok( true, 'listener3');
+    }
+    function listener4 () {
+        ok( true, 'listener4' );
+    }
+    evt.on( 'roar', listener1, listener2, listener3 ).on( 'roar', listener4 );
+    expect( 4 );
+    evt.trigger( 'roar' );
+    evt.off( 'roar' );
+    evt.trigger( 'roar' );//none of them should be called
+});
+
+test( 'remove all listeners for every event name of the eventjs object', function () {
+    var evt = new Eventjs( 'roar', 'meow' );
+    function listener1 () {
+        ok( true, 'listener1');
+    }
+    function listener2 () {
+        ok( true, 'listener2' );
+    }
+    function listener3 () {
+        ok( true, 'listener3');
+    }
+    function listener4 () {
+        ok( true, 'listener4' );
+    }
+    evt.on( 'roar', listener1 ).on( 'roar', listener2 );
+    evt.on( 'meow', listener3 ).on( 'roar', listener4 );
+    expect( 4 );
+    evt.trigger( 'roar' );
+    evt.trigger( 'meow' );
+    evt.off();
+    evt.trigger( 'roar' );//none should be called
+    evt.trigger( 'meow' );//none should be called
+});

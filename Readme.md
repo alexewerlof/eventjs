@@ -92,11 +92,3 @@ Tests
 
 [1]: http://www.qunit.com
 [2]: http://htmlpreview.github.com/?https://github.com/hanifbbz/eventjs/blob/master/test/qunit.html
-
-
-
-
-
-
-```Javascript
-```

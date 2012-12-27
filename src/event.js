@@ -10,6 +10,8 @@
  * Duplicate target objects is allowed too. The last one will be set as the target.
  * If no target object is specified, the listener functions will be called with their 'this' set to the current instance
  * of eventjs object.
+ * @throws TypeError if any of the variables has a type other than string or object
+ * @throws ReferenceError if this instance is not created with the 'new' keyword and no object is passed as the target
  * @constructor
  */
 function Eventjs ( /* list of at least event names and one optional target object (in any order) */ ) {
@@ -26,34 +28,30 @@ function Eventjs ( /* list of at least event names and one optional target objec
                 target = arg;// 'this' for the listeners
                 break;
             default:
-                throw {
-                    'name': 'Invalid parameter',
-                    'message': 'Eventjs() only accepts string and object parameters'
-                };
+                throw new TypeError( 'Eventjs() only accepts string and object parameters' );
                 break;
         }
     }
 
     if ( ( target === this ) && !( this instanceof Eventjs ) ) {
-        throw {
-            'name': 'Cannot attach the event object',
-            'message': 'Eventjs is not called with "new" keyword and no parameter of type object is passed to it'
-        }
+        throw new ReferenceError( 'Eventjs is not called with "new" keyword and no parameter of type object is passed to it' );
     }
 
-    //** if there is no such event, throw an exception
+    /**
+     * if there is no such event, throw an exception
+     * @throws ReferenceError if the event name is not registered in this handler when this Eventjs object was created
+     */
     function checkEventName ( eventName ) {
         "use strict";
         if ( typeof eventName !== 'string' || !events[ eventName ] ) {
-            throw {
-                'name': 'Invalid event name',
-                'message': 'The event name does not exist in this event manager: ' + eventName
-            }
+            throw new ReferenceError( 'The event name does not exist in this event manager: ' + eventName );
         }
         return true;
     }
 
-    //** registers an event listener
+    /**
+     * registers an event listener
+     */
     target.on = function ( eventName/*, one or more listeners... */ ) {
         "use strict";
         checkEventName( eventName );
@@ -68,7 +66,9 @@ function Eventjs ( /* list of at least event names and one optional target objec
         return this;
     };
 
-    //** un-register a handler from an event name. if handler is missing, all handlers will be removed
+    /**
+     * un-register a handler from an event name. if handler is missing, all handlers will be removed
+     */
     target.off = function ( eventName/*, one or more listeners... */ ) {
         "use strict";
         switch ( arguments.length ) {
@@ -106,7 +106,10 @@ function Eventjs ( /* list of at least event names and one optional target objec
         return this;
     };
 
-    //** triggers a handler with a list of arguments. Any argument to the event handler can follow the eventName
+    /**
+     * triggers a handler with a list of arguments. Any argument to the event handler can follow the eventName
+     * @throws Error if any of the listeners throws an error (the rest will run however)
+     */
     target.trigger = function ( eventName /*, optional list of arguments to be passed to event handler */ ) {
         "use strict";
         checkEventName( eventName );
@@ -127,7 +130,7 @@ function Eventjs ( /* list of at least event names and one optional target objec
             }
         }
         if ( errors.length > 0 ) {
-            throw "One or more event handlers couldn't run successfully: " + errors;
+            throw new Error( 'One or more event handlers could not run successfully: ' + errors );
         }
         return this;
     };

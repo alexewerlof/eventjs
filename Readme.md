@@ -9,10 +9,14 @@ Eventjs is a library for creating event-handling mechanism in Javascript. Featur
  * Safe: "use strict", checked JSLint
  * Chainability
 
-Making an event handler
+The event handler basically does two things:
+ * Provide functions for registering (`on`) and unregistering (`off`) event listeners
+ * Provide a function for calling the event listeners (`trigger`)
+
+Creating an event handler
 -----------------------
 You can attach the event handler to another object or create it independently. In order to attach it to an object, call
-it on the object with a list of event names:
+it on the object with a list of event names (strings):
 
 ```Javascript
 var obj = {};

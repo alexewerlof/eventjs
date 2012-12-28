@@ -104,8 +104,8 @@ function Eventjs ( /* list of at least event names and one optional target objec
      * If an error prevents a listener from running, the other
      * listeners will run anyway. After the execution is complete, the trigger() function throws an array containing
      * information about those errors.
-     * @throws an array of error objects which give information about which listener thrown what error. Each element of
-     * this array contains a 'listener' and an 'error' key.
+     * @throws Array of array of exception objects which give information about which listener was interrupted with an
+     * exception. Each element of this array contains a 'listener' and an 'error' key.
      */
     target.trigger = function ( eventName /*, optional list of arguments to be passed to event handler */ ) {
         "use strict";
